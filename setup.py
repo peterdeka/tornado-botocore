@@ -28,7 +28,6 @@ http://docs.python.org/2/distutils/sourcedist.html
 
 """
 import os
-import tornado_botocore as app
 
 from setuptools import setup, find_packages
 from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
@@ -36,7 +35,7 @@ from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 
 class bdist_egg(_bdist_egg):
     def run(self):
-        #call(["pip install -r requirements.txt --no-clean"], shell=True)
+        call(["pip install -r requirements.txt --no-clean"], shell=True)
         _bdist_egg.run(self)
 
 def read(fname):
@@ -47,7 +46,7 @@ def read(fname):
 
 setup(
     name="tornado-botocore",
-    version=app.__version__,
+    version="0.0.4",
     description=read('DESCRIPTION'),
     long_description=read('README.rst'),
     license='The MIT License',
