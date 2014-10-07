@@ -36,7 +36,7 @@ from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 
 class bdist_egg(_bdist_egg):
     def run(self):
-        call(["pip install -r requirements.txt --no-clean"], shell=True)
+        #call(["pip install -r requirements.txt --no-clean"], shell=True)
         _bdist_egg.run(self)
 
 def read(fname):
