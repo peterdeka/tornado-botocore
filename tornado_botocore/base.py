@@ -7,10 +7,12 @@ from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
 class Botocore(object):
 
-    def __init__(self, service, operation, region_name, session=None):
+    def __init__(self, service, operation, region_name, access_key, secret_key, session=None):
         self.session = session or botocore.session.get_session()
+        self.session.set_credentials(access_key,secret_key)
         self.service = self.session.get_service(service)
         self.operation = self.service.get_operation(operation)
+        self.operation.metadata = dict(protocol = 'rest-xml')
         self.http_client = AsyncHTTPClient()
         self.operation.call = self.operation_call
         self.endpoint = self.service.get_endpoint(region_name)
@@ -40,16 +42,15 @@ class Botocore(object):
             signer = self.endpoint.auth
         else:
             signer = None
-        request = self.endpoint._create_request_object(operation, params)
+        request = self.endpoint._create_request_object( params)
         prepared_request = self.endpoint.prepare_request(request, signer)
         return prepared_request
 
     def prepare_response(self, http_response, callback):
         http_response.content = http_response.body
         http_response.encoding = 'utf-8'
-        response = botocore.response.get_response(
-            session=self.session, operation=self.operation,
-            http_response=http_response)
+        http_response.status_code = http_response.code
+        response = botocore.response.get_response(self.operation,http_response)
         event = self.session.create_event('after-call',
             self.service.endpoint_prefix, self.operation.name)
         self.session.emit(event, operation=self.operation,
